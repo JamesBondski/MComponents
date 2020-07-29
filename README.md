@@ -1,5 +1,7 @@
 # MComponents
 
+In this fork I will adjust the IGridDataAdapter to be more easily usable with a standard data source by directly requesting the IQueryable from the adapter instead of using IEnumerable.Empty.
+
 [![Package Version](https://img.shields.io/nuget/v/MComponents.svg)](https://www.nuget.org/packages/MComponents)
 [![Package Version](https://img.shields.io/nuget/v/MComponents.Shared.svg)](https://www.nuget.org/packages/MComponents.Shared)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/MComponents.svg)](https://www.nuget.org/packages/MComponents)
