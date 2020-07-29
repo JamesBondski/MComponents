@@ -7,9 +7,7 @@ namespace MComponents.MGrid
 {
     public interface IMGridDataAdapter<T>
     {
-        Task<IEnumerable<T>> GetData(IQueryable<T> pQueryable);
-
-        Task<long> GetDataCount(IQueryable<T> pQueryable);
+        IQueryable<T> GetQueryable();
 
         Task<long> GetTotalDataCount();
 

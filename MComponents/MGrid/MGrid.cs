@@ -364,7 +364,7 @@ namespace MComponents.MGrid
                        {
                            if (DataSource != null)
                            {
-                               DataCache = GetIQueryable(DataSource).ToArray();
+                               DataCache = GetIQueryable(DataSource as IQueryable<T>).ToArray();
                            }
                            else if (DataAdapter == null)
                                throw new InvalidOperationException("Please provide a " + nameof(DataSource) + " or " + nameof(DataAdapter));
@@ -455,9 +455,9 @@ namespace MComponents.MGrid
             builder.CloseRegion();
         }
 
-        private IQueryable<T> GetIQueryable(IEnumerable<T> pSource)
+        private IQueryable<T> GetIQueryable(IQueryable<T> pSource)
         {
-            IQueryable<T> data = pSource as IQueryable<T>;
+            IQueryable<T> data = pSource;
 
             if (data == null)
                 data = pSource.AsQueryable();
@@ -1309,7 +1309,7 @@ namespace MComponents.MGrid
 
             if (dataForExport == null && DataAdapter != null)
             {
-                dataForExport = await DataAdapter.GetData(Enumerable.Empty<T>().AsQueryable());
+                dataForExport = DataAdapter.GetQueryable();
             }
 
             var data = ExcelExportHelper.GetExcelSpreadsheet<T>(ColumnsList, mPropertyInfoCache, dataForExport, Formatter);
@@ -1342,23 +1342,11 @@ namespace MComponents.MGrid
         {
             if (DataCache == null && DataAdapter != null)
             {
-                var queryable = GetIQueryable(Enumerable.Empty<T>());
-
-                await Task.Run(() => DataAdapter.GetData(queryable)).ContinueWith(async a =>
-                {
-                    DataCache = a.Result.ToArray();
-
-                    await Task.Run(() => DataAdapter.GetDataCount(queryable)).ContinueWith(async a =>
-                    {
-                        DataCountCache = a.Result;
-
-                        await Task.Run(() => DataAdapter.GetTotalDataCount()).ContinueWith(a =>
-                        {
-                            TotalDataCountCache = a.Result;
-                            InvokeAsync(() => StateHasChanged());
-                        });
-                    });
-                });
+                var queryable = GetIQueryable(DataAdapter.GetQueryable());
+                DataCache = queryable.ToArray();
+                DataCountCache = DataCache.Count;
+                TotalDataCountCache = await DataAdapter.GetTotalDataCount();
+                await InvokeAsync(() => StateHasChanged());
             }
         }
 
